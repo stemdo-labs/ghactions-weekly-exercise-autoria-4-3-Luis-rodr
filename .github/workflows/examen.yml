@@ -13,7 +13,7 @@ jobs:
       IMAGE_TAG: ${{ steps.ci.outputs.IMAGE_TAG }}
     steps:
       - name: call_workflow_ci
-        uses: ./.github/examen_autoria_luis/workflowCI.yaml
+        uses: ./.github/examen_autoria_luis
         id: ci
   cd:
     runs-on: ubuntu-latest
