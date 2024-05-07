@@ -8,10 +8,12 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       IMAGE_TAG: ${{ steps.generate_id.outputs.IMAGE_TAG }}
+
     permissions:
       contents: read
       packages: write
       attestations: write
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -26,13 +28,6 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Docker Build y Push
-        id: docker-build-push
-        uses: ./.github/actions/docker-build-push/
-        with:
-          env: 
-            GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: Build - Push
         shell: bash
