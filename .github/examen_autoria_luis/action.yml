@@ -1,0 +1,22 @@
+name: Build and publish
+
+description: descripcion
+
+inputs:
+  GH_TOKEN:
+    description: el de luis
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Login en Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ inputs.username }}
+        password: ${{ inputs.password }}
+    - name: Build - Push
+      shell: bash
+      run: |
+        docker build -t ${{ inputs.username }}/gh_entregable:${{ inputs.version }} .
+        docker push ${{ inputs.username }}/gh_entregable:${{ inputs.version }}

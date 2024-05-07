@@ -1,0 +1,42 @@
+name: CI examen
+
+on:
+  workflow_call:
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    outputs:
+      IMAGE_TAG: ${{ steps.generate_id.outputs.IMAGE_TAG }}
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Obtener version de la aplicación
+        id: generate_id
+        run: echo "IMAGE_TAG=$(date '+%Y%m%d%H%M%S')" >> "$GITHUB_OUTPUT"  
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker Build y Push
+        id: docker-build-push
+        uses: ./.github/actions/docker-build-push/
+        with:
+          env: 
+            GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      - name: Build - Push
+        shell: bash
+        run: |
+          docker build -t ${{ github.actor  }}/gh_entregable:${{ steps.generate_id.outputs.IMAGE_TAG }} .
+          docker push ${{ github.actor }}/gh_entregable:${{ steps.generate_id.outputs.IMAGE_TAG }}
+      
