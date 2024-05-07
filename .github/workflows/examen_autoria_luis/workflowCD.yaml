@@ -1,0 +1,39 @@
+name: CD reusable
+
+on: 
+  workflow_call:
+    inputs:
+      IMAGE_TAG:  
+        description: 'RNG-Artifact-name'
+        required: true
+        type: string
+      REGISTRY:  
+        description: 'RNG-Artifact-name'
+        required: true
+        type: string
+
+  deployment:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.IMAGE-TAG }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Log in to the Container registry
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: download image
+        run: docker pull ${{ secrets.GH_TOKEN }}/gh_entregable:${{ inputs.IMAGE_TAG }}
+
+      - name: docker run
+        run: docker run -d -p 8080:8080 ${{ secrets.GH_TOKEN }}/gh_entregable:${{ inputs.IMAGE_TAG }}
+
+      - name: curl
+        run: |
+          curl http://localhost:8080 >> result.html
+          cat result.html
